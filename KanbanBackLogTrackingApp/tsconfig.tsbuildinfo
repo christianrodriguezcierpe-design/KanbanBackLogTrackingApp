@@ -1,0 +1,1 @@
+{"root":["./src/app.tsx","./src/constants.ts","./src/main.tsx","./src/testsetup.ts","./src/types.ts","./src/__tests__/board.test.ts","./src/__tests__/storage.test.ts","./src/components/boardcolumn.tsx","./src/components/taskmodal.tsx","./src/utils/board.ts","./src/utils/storage.ts"],"version":"5.9.3"}

@@ -1,0 +1,305 @@
+:root {
+  --bg: #f4f7fb;
+  --surface: #ffffff;
+  --ink: #1f2937;
+  --muted: #64748b;
+  --line: #d9e2ec;
+  --primary: #1864ab;
+  --danger: #b42318;
+  --todo: #e6efff;
+  --in-progress: #fff5de;
+  --done: #e8f7ea;
+}
+
+* {
+  box-sizing: border-box;
+}
+
+body {
+  margin: 0;
+  font-family: 'Segoe UI', Tahoma, sans-serif;
+  color: var(--ink);
+  background: radial-gradient(circle at 20% 0%, #e8f1ff 0%, var(--bg) 48%);
+}
+
+button,
+input,
+select,
+textarea {
+  font: inherit;
+}
+
+.app {
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 1rem;
+}
+
+.app-header {
+  display: flex;
+  gap: 1rem;
+  justify-content: space-between;
+  align-items: flex-start;
+  margin-bottom: 1rem;
+}
+
+h1 {
+  margin: 0;
+  font-size: 1.75rem;
+}
+
+.subtitle {
+  margin: 0.25rem 0 0;
+  color: var(--muted);
+}
+
+.header-controls {
+  display: flex;
+  gap: 0.5rem;
+  align-items: center;
+  flex-wrap: wrap;
+}
+
+.pill {
+  background: #e2e8f0;
+  padding: 0.3rem 0.65rem;
+  border-radius: 999px;
+  font-size: 0.9rem;
+}
+
+button {
+  border: 1px solid transparent;
+  padding: 0.5rem 0.9rem;
+  border-radius: 0.6rem;
+  cursor: pointer;
+}
+
+button:focus-visible,
+input:focus-visible,
+select:focus-visible,
+textarea:focus-visible {
+  outline: 3px solid #7cc4fa;
+  outline-offset: 2px;
+}
+
+button.primary {
+  background: var(--primary);
+  color: #fff;
+}
+
+button.secondary {
+  background: #edf2f7;
+  color: var(--ink);
+}
+
+button.danger {
+  background: #fee4e2;
+  color: var(--danger);
+}
+
+.warning {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 0.75rem;
+  background: #fff4e5;
+  border: 1px solid #facc8b;
+  border-radius: 0.5rem;
+  padding: 0.6rem 0.75rem;
+  margin-bottom: 1rem;
+}
+
+.filters {
+  display: grid;
+  gap: 0.8rem;
+  grid-template-columns: repeat(auto-fit, minmax(170px, 1fr));
+  background: var(--surface);
+  border: 1px solid var(--line);
+  border-radius: 0.8rem;
+  padding: 0.8rem;
+  margin-bottom: 1rem;
+}
+
+.filters label {
+  display: grid;
+  gap: 0.3rem;
+  font-size: 0.9rem;
+}
+
+input,
+select,
+textarea {
+  border: 1px solid var(--line);
+  border-radius: 0.5rem;
+  padding: 0.5rem;
+  background: #fff;
+}
+
+.board {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 0.9rem;
+}
+
+.column {
+  border: 1px solid var(--line);
+  border-radius: 0.8rem;
+  padding: 0.75rem;
+  background: var(--surface);
+  min-height: 420px;
+}
+
+.column:nth-child(1) {
+  background: linear-gradient(180deg, var(--todo), #fff 35%);
+}
+
+.column:nth-child(2) {
+  background: linear-gradient(180deg, var(--in-progress), #fff 35%);
+}
+
+.column:nth-child(3) {
+  background: linear-gradient(180deg, var(--done), #fff 35%);
+}
+
+.column-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.column-header h2 {
+  margin: 0;
+  font-size: 1.15rem;
+}
+
+.column-cards {
+  margin-top: 0.75rem;
+  display: grid;
+  gap: 0.65rem;
+}
+
+.empty {
+  color: var(--muted);
+  margin: 0.5rem 0;
+  font-size: 0.92rem;
+}
+
+.task-card {
+  border: 1px solid rgba(17, 24, 39, 0.12);
+  border-radius: 0.75rem;
+  padding: 0.65rem;
+  box-shadow: 0 2px 8px rgba(15, 23, 42, 0.08);
+}
+
+.task-card.dragging {
+  opacity: 0.75;
+}
+
+.task-card h3 {
+  margin: 0 0 0.35rem;
+  font-size: 1rem;
+}
+
+.task-card p {
+  margin: 0 0 0.45rem;
+  font-size: 0.9rem;
+}
+
+.task-card dl {
+  margin: 0;
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 0.25rem 0.5rem;
+}
+
+.task-card dt {
+  font-size: 0.72rem;
+  color: var(--muted);
+}
+
+.task-card dd {
+  margin: 0;
+  text-transform: capitalize;
+  font-size: 0.84rem;
+}
+
+.task-card .actions {
+  display: flex;
+  justify-content: flex-end;
+  gap: 0.45rem;
+  margin-top: 0.45rem;
+}
+
+.color-yellow {
+  background: #fff9c8;
+}
+
+.color-blue {
+  background: #d9ecff;
+}
+
+.color-green {
+  background: #dcfce7;
+}
+
+.color-pink {
+  background: #fde2ef;
+}
+
+.color-orange {
+  background: #ffe8cc;
+}
+
+.modal-backdrop {
+  position: fixed;
+  inset: 0;
+  background: rgba(15, 23, 42, 0.45);
+  display: grid;
+  place-items: center;
+  padding: 1rem;
+}
+
+.modal {
+  width: min(640px, 100%);
+  background: #fff;
+  border-radius: 0.85rem;
+  padding: 1rem;
+  display: grid;
+  gap: 0.6rem;
+}
+
+.modal h2 {
+  margin: 0;
+}
+
+.modal label {
+  display: grid;
+  gap: 0.25rem;
+  font-size: 0.9rem;
+}
+
+.modal .row {
+  display: grid;
+  gap: 0.6rem;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+}
+
+.modal-actions {
+  display: flex;
+  justify-content: flex-end;
+  gap: 0.6rem;
+}
+
+@media (max-width: 900px) {
+  .board {
+    grid-template-columns: 1fr;
+  }
+
+  .app-header {
+    flex-direction: column;
+  }
+
+  .modal .row {
+    grid-template-columns: 1fr;
+  }
+}
