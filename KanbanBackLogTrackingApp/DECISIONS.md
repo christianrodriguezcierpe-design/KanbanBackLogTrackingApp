@@ -10,3 +10,8 @@
 - Context: The new `Backlog` column changed the persisted data contract.
 - Decision: Move active storage key to `kanban.backlog.v2` and automatically migrate valid `kanban.backlog.v1` payloads on load.
 - Consequences: Existing local users keep their data without manual action; corrupted/invalid payloads still reset safely.
+
+## 2026-02-14 - Preserve card action buttons while draggable
+- Context: Card-level drag listeners captured pointer events and prevented reliable `Edit`/`Delete` clicks in deployed UI.
+- Decision: Stop pointer event propagation for the action area/buttons so drag initiation does not consume action clicks.
+- Consequences: `Edit`/`Delete` are now reliable while sortable drag behavior remains available on the card.

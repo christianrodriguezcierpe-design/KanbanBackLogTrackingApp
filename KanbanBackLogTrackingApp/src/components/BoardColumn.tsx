@@ -1,6 +1,7 @@
 import { useDroppable } from '@dnd-kit/core';
 import { useSortable } from '@dnd-kit/sortable';
 import { CSS } from '@dnd-kit/utilities';
+import type { PointerEvent as ReactPointerEvent } from 'react';
 import type { ColumnId, TaskCard } from '../types';
 
 interface BoardColumnProps {
@@ -51,6 +52,10 @@ function TaskCardItem({ card, onEdit, onDelete }: TaskCardItemProps) {
     transition,
   };
 
+  function stopDragEventPropagation(event: ReactPointerEvent<HTMLDivElement | HTMLButtonElement>) {
+    event.stopPropagation();
+  }
+
   return (
     <article
       ref={setNodeRef}
@@ -80,11 +85,11 @@ function TaskCardItem({ card, onEdit, onDelete }: TaskCardItemProps) {
           </div>
         )}
       </dl>
-      <div className="actions">
-        <button type="button" onClick={() => onEdit(card)}>
+      <div className="actions" onPointerDown={stopDragEventPropagation}>
+        <button type="button" onPointerDown={stopDragEventPropagation} onClick={() => onEdit(card)}>
           Edit
         </button>
-        <button type="button" onClick={() => onDelete(card.id)}>
+        <button type="button" onPointerDown={stopDragEventPropagation} onClick={() => onDelete(card.id)}>
           Delete
         </button>
       </div>
