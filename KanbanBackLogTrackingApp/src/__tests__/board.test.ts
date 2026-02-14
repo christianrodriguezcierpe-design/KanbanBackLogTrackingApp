@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest';
-import { createTask, editTask, getVisibleCards, moveTask } from '../utils/board';
+import { createTask, editTask, getBacklogPromotionMissingFields, getVisibleCards, moveTask } from '../utils/board';
 import type { TaskCard } from '../types';
 
 function sampleCards(): TaskCard[] {
@@ -11,7 +11,7 @@ function sampleCards(): TaskCard[] {
       projectTag: 'app',
       priority: 'low',
       color: 'yellow',
-      columnId: 'todo',
+      columnId: 'backlog',
       createdAt: '2026-01-01T00:00:00.000Z',
       updatedAt: '2026-01-01T00:00:00.000Z',
     },
@@ -37,7 +37,7 @@ describe('board helpers', () => {
         title: '  Learn DnD  ',
         priority: 'medium',
         color: 'green',
-        columnId: 'todo',
+        columnId: 'backlog',
       },
       now,
       'uuid-1',
@@ -75,5 +75,20 @@ describe('board helpers', () => {
 
     expect(visible).toHaveLength(1);
     expect(visible[0].id).toBe('1');
+  });
+
+  it('backlog triage helper reports missing fields', () => {
+    const missing = getBacklogPromotionMissingFields({
+      ...sampleCards()[0],
+      title: '  ',
+      projectTag: '  ',
+    });
+
+    expect(missing).toEqual(['title', 'project tag']);
+  });
+
+  it('backlog triage helper passes complete tasks', () => {
+    const missing = getBacklogPromotionMissingFields(sampleCards()[0]);
+    expect(missing).toEqual([]);
   });
 });

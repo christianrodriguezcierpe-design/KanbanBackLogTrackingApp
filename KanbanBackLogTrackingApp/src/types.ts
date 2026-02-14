@@ -1,4 +1,4 @@
-export type ColumnId = 'todo' | 'in_progress' | 'done';
+export type ColumnId = 'backlog' | 'todo' | 'in_progress' | 'done';
 export type Priority = 'low' | 'medium' | 'high';
 export type CardColor = 'yellow' | 'blue' | 'green' | 'pink' | 'orange';
 
@@ -16,7 +16,7 @@ export interface TaskCard {
 }
 
 export interface BoardState {
-  version: 1;
+  version: 2;
   cards: TaskCard[];
   searchQuery: string;
   filterTag: string | null;

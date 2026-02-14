@@ -108,6 +108,7 @@ export function TaskModal({
               value={draft.columnId}
               onChange={(event) => onChange({ ...draft, columnId: event.target.value as ColumnId })}
             >
+              <option value="backlog">Backlog</option>
               <option value="todo">To Do</option>
               <option value="in_progress">In Progress</option>
               <option value="done">Done</option>

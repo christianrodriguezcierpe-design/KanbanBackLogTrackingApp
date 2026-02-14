@@ -14,13 +14,14 @@ import {
   sortableKeyboardCoordinates,
   verticalListSortingStrategy,
 } from '@dnd-kit/sortable';
-import { COLUMNS, COLORS, PRIORITIES, TITLE_MAX_LENGTH } from './constants';
+import { COLUMNS, COLORS, DEFAULT_BOARD_STATE, PRIORITIES, TITLE_MAX_LENGTH } from './constants';
 import type { BoardState, CardColor, ColumnId, Priority, TaskCard } from './types';
 import {
   clearDone,
   createTask,
   deleteTask,
   editTask,
+  getBacklogPromotionMissingFields,
   getColumnCards,
   getTagOptions,
   getVisibleCards,
@@ -47,15 +48,7 @@ const DEFAULT_DRAFT: TaskDraft = {
   priority: 'medium',
   dueDate: '',
   color: 'yellow',
-  columnId: 'todo',
-};
-
-const DEFAULT_BOARD_STATE: BoardState = {
-  version: 1,
-  cards: [],
-  searchQuery: '',
-  filterTag: null,
-  filterPriority: null,
+  columnId: 'backlog',
 };
 
 function uuid(): string {
@@ -81,14 +74,22 @@ function mapCardToDraft(card: TaskCard): TaskDraft {
   };
 }
 
+function formatMissingFields(fields: string[]): string {
+  if (fields.length === 1) {
+    return fields[0];
+  }
+
+  return `${fields.slice(0, -1).join(', ')} and ${fields[fields.length - 1]}`;
+}
+
 export default function App() {
   const loaded = typeof window === 'undefined' ? { state: DEFAULT_BOARD_STATE, warning: null } : loadBoardState();
   const [state, setState] = useState<BoardState>(loaded.state);
   const [warning, setWarning] = useState<string | null>(loaded.warning);
+  const [toastMessage, setToastMessage] = useState<string | null>(null);
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [editingId, setEditingId] = useState<string | null>(null);
   const [draft, setDraft] = useState<TaskDraft>(DEFAULT_DRAFT);
-  const [activeAddColumn, setActiveAddColumn] = useState<ColumnId>('todo');
 
   const sensors = useSensors(
     useSensor(PointerSensor),
@@ -119,9 +120,22 @@ export default function App() {
     };
   }, [state]);
 
-  function openCreateModal(columnId?: ColumnId) {
-    const chosenColumn = columnId ?? activeAddColumn;
-    setDraft({ ...DEFAULT_DRAFT, columnId: chosenColumn });
+  useEffect(() => {
+    if (!toastMessage) {
+      return;
+    }
+
+    const timer = window.setTimeout(() => {
+      setToastMessage(null);
+    }, 3000);
+
+    return () => {
+      window.clearTimeout(timer);
+    };
+  }, [toastMessage]);
+
+  function openCreateModal(columnId: ColumnId = 'backlog') {
+    setDraft({ ...DEFAULT_DRAFT, columnId });
     setEditingId(null);
     setIsModalOpen(true);
   }
@@ -136,6 +150,19 @@ export default function App() {
     const trimmedTitle = draft.title.trim();
     if (!trimmedTitle) {
       return;
+    }
+
+    if (draft.columnId !== 'backlog') {
+      const missing = getBacklogPromotionMissingFields({
+        title: draft.title,
+        projectTag: draft.projectTag,
+        priority: draft.priority,
+      });
+
+      if (missing.length > 0) {
+        setToastMessage(`Complete triage before saving outside Backlog: ${formatMissingFields(missing)}.`);
+        return;
+      }
     }
 
     if (editingId) {
@@ -256,6 +283,14 @@ export default function App() {
       targetIndex = getColumnCards(state.cards, targetColumn).findIndex((card) => card.id === overCard.id);
     }
 
+    if (activeCard.columnId === 'backlog' && targetColumn !== 'backlog') {
+      const missing = getBacklogPromotionMissingFields(activeCard);
+      if (missing.length > 0) {
+        setToastMessage(`Complete triage before moving out of Backlog: ${formatMissingFields(missing)}.`);
+        return;
+      }
+    }
+
     setState((prev) => ({
       ...prev,
       cards: moveTask(prev.cards, taskId, targetColumn, targetIndex, nowIso()),
@@ -289,6 +324,12 @@ export default function App() {
           <button type="button" onClick={() => setWarning(null)}>
             Dismiss
           </button>
+        </div>
+      )}
+
+      {toastMessage && (
+        <div className="toast-warning" role="status" aria-live="polite">
+          {toastMessage}
         </div>
       )}
 
@@ -362,10 +403,7 @@ export default function App() {
                   count={columnCards.length}
                   cards={columnCards}
                   emptyHint={column.emptyHint}
-                  onAdd={() => {
-                    setActiveAddColumn(column.id);
-                    openCreateModal(column.id);
-                  }}
+                  onAdd={() => openCreateModal(column.id)}
                   onEdit={openEditModal}
                   onDelete={handleDeleteTask}
                 />

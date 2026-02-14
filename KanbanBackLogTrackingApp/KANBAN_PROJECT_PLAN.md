@@ -2,7 +2,7 @@
 
 ## Summary
 Build a simple personal Kanban web app to support two goals: learning AI-assisted coding and providing an easy personal project tracker.
-v1 will be a single-board, local-first SPA with color post-it style cards and three fixed columns: `To Do`, `In Progress`, `Done`.
+v1 will be a single-board, local-first SPA with color post-it style cards and four fixed columns: `Backlog`, `To Do`, `In Progress`, `Done`.
 Tech stack and deployment are locked to `React + Vite + TypeScript` and `GitHub Pages` via GitHub Actions.
 
 ## Scope
@@ -25,7 +25,7 @@ Out of scope for v1:
 ## Product Content (What the app should contain)
 Core board layout:
 - Header: app name, short subtitle, task count, quick-add button.
-- Columns: `To Do`, `In Progress`, `Done`.
+- Columns: `Backlog`, `To Do`, `In Progress`, `Done`.
 - Each column shows count and empty-state hint text.
 
 Task card content:
@@ -42,18 +42,19 @@ Recommended post-it color palette:
 - Keep contrast AA-compliant for text readability.
 
 v1 UX behaviors:
-- Quick-add task in current column.
+- Quick-add task in `Backlog` by default.
 - Drag card to reorder within column and move across columns.
 - Edit task in lightweight modal/panel.
 - Filter by tag and priority.
 - Search by title/description.
 - “Clear Done” action with confirmation.
+- Promotion gate: moving from `Backlog` to execution columns, or saving directly into execution columns, requires `title`, `project tag`, and `priority`.
 
 ## Important Public Interfaces / Types
 Define these TypeScript contracts and keep them stable through v1:
 
 ```ts
-type ColumnId = "todo" | "in_progress" | "done";
+type ColumnId = "backlog" | "todo" | "in_progress" | "done";
 type Priority = "low" | "medium" | "high";
 type CardColor = "yellow" | "blue" | "green" | "pink" | "orange";
 
@@ -71,7 +72,7 @@ interface TaskCard {
 }
 
 interface BoardState {
-  version: 1;
+  version: 2;
   cards: TaskCard[];
   searchQuery: string;
   filterTag: string | null;
@@ -80,7 +81,8 @@ interface BoardState {
 ```
 
 Local persistence contract:
-- `localStorage` key: `kanban.backlog.v1`.
+- `localStorage` key: `kanban.backlog.v2`.
+- Legacy key `kanban.backlog.v1` auto-migrated on first load.
 - Save debounced after every state change.
 - On invalid/corrupt payload: reset safely to empty board and show non-blocking warning.
 
@@ -91,7 +93,7 @@ Local persistence contract:
 - Add `README.md` with product intent and local run steps.
 
 2. Core app shell
-- Build board layout with 3 fixed columns.
+- Build board layout with 4 fixed columns including `Backlog` intake.
 - Add responsive grid/stack behavior.
 
 3. Task CRUD
@@ -127,8 +129,10 @@ Automated tests (Vitest + Testing Library):
 - Editing updates `updatedAt`.
 - Deleting removes task.
 - Moving card changes `columnId` and order.
+- Backlog promotion gate blocks move when required triage fields are missing.
 - Filtering/search returns expected subsets.
 - Persistence reload restores board state.
+- Legacy v1 payload migrates to v2 key.
 - Corrupt storage payload triggers safe reset behavior.
 
 Manual scenarios:
@@ -174,4 +178,4 @@ Suggested initial issue list:
 - Chosen by you: `React + Vite + TypeScript`.
 - Chosen by you: single-board v1.
 - Chosen by you: deploy to GitHub Pages from personal repo.
-- Default column labels normalized to `To Do`, `In Progress`, `Done` (fixing typo “In proces”).
+- Default column labels normalized to `Backlog`, `To Do`, `In Progress`, `Done`.

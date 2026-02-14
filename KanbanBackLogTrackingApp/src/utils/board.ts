@@ -16,7 +16,14 @@ interface FilterInput {
   filterPriority: Priority | null;
 }
 
-const COLUMN_ORDER: ColumnId[] = ['todo', 'in_progress', 'done'];
+const COLUMN_ORDER: ColumnId[] = ['backlog', 'todo', 'in_progress', 'done'];
+const PRIORITIES: Priority[] = ['low', 'medium', 'high'];
+
+interface BacklogPromotionCandidate {
+  title: string;
+  projectTag?: string;
+  priority: Priority;
+}
 
 export function createTask(input: CreateTaskInput, now: string, id: string): TaskCard {
   return {
@@ -55,6 +62,7 @@ export function moveTask(
   now: string,
 ): TaskCard[] {
   const lists: Record<ColumnId, TaskCard[]> = {
+    backlog: [],
     todo: [],
     in_progress: [],
     done: [],
@@ -134,4 +142,22 @@ export function getTagOptions(state: BoardState): string[] {
         .filter((tag): tag is string => Boolean(tag)),
     ),
   ).sort((a, b) => a.localeCompare(b));
+}
+
+export function getBacklogPromotionMissingFields(card: BacklogPromotionCandidate): string[] {
+  const missing: string[] = [];
+
+  if (!card.title.trim()) {
+    missing.push('title');
+  }
+
+  if (!card.projectTag?.trim()) {
+    missing.push('project tag');
+  }
+
+  if (!PRIORITIES.includes(card.priority)) {
+    missing.push('priority');
+  }
+
+  return missing;
 }
